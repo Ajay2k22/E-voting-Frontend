@@ -1,9 +1,11 @@
 <script>
 import Button from '../components/basic/Button.vue';
+import axios from 'axios'
 import { backend } from '../backend';
 import { voterStore } from '../store/voter.js';
-import { candidateStore } from '../store/candidate.js'
-import { contractStore } from '../store/contractStore.js'
+import { candidateStore } from '../store/candidate.js';
+import { contractStore } from '../store/contractStore.js';
+
 export default {
     name: 'ElectionAdmin',
     setup() {
@@ -20,8 +22,8 @@ export default {
             candidates: '',
             total_votes: '',
             length: '',
-            authorize:'',
-            electionstart:''
+            authorize: '',
+            electionstart: ''
         }
     },
 
@@ -30,38 +32,69 @@ export default {
     },
 
     methods: {
-        async getElectionStarted(){
-            this.electionstart=await this.contract_store.owner()
-            
+        async EndElection() {
+            let length = await this.contract_store.contract.getNumCandidates()
+            console.log(length.toString())
+            this.length = length.toString()
+
+            for (let i = 0; i < this.length; i++) {
+                let response = await this.contract_store.contract.candidates(i)
+                let electionName = await this.contract_store.contract.electionName()
+                // alert(`${res1}`)
+                // console.log("Just error")
+                // console.log(`${res1}`)
+                try {
+                    const res = await axios.post('http://localhost:3000/api/end-election', {
+                        name: response.name,
+                        age: response.age.toString(),
+                        party: response.party,
+                        elctionName: electionName,
+                        numVotes: response.numVotes.toString(),
+                    })
+                } catch (e) {
+                    console.log(e)
+                }
+
+                // candidate.push(response.name, response.party, response.age.toString(), response.numVotes.toString())
+
+
+            }
+
+            alert("Election has been ended")
+            this.$router.push({name:'Home'})
+        },
+        async getElectionStarted() {
+            this.electionstart = await this.contract_store.owner()
+
         },
         async authorizeVoter1() {
             try {
                 let response = await this.contract_store.contract.authorizeVoter1(this.voter_store.voter_address)
                 console.log(`success ${response}`)
-                this.authorize=response.toString()
+                this.authorize = response.toString()
                 alert('Authorized done')
             } catch (e) {
                 console.log(e)
             }
         },
         async first() {
-            
+
             let length = await this.contract_store.contract.getNumCandidates()
             console.log(length.toString())
             this.length = length.toString()
-            if (this.length){
+            if (this.length) {
                 for (let i = 0; i < this.length; i++) {
-                let response = await this.contract_store.contract.candidates(i)
-                this.candidate_store.pushCandidate({
-                    id: i,
-                    name: response.name,
-                    age: response.age,
-                    party: response.party,
-                    numvotes: response.numVotes
-                })
+                    let response = await this.contract_store.contract.candidates(i)
+                    this.candidate_store.pushCandidate({
+                        id: i,
+                        name: response.name,
+                        age: response.age,
+                        party: response.party,
+                        numvotes: response.numVotes
+                    })
+                }
             }
-            }
-            
+
             // console.log(response)
 
         },
@@ -70,7 +103,7 @@ export default {
                 let response = await this.contract_store.contract.getTotalVotes()
                 console.log(`success ${response.toString()}`)
                 this.total_votes = response.toString()
-                
+
             } catch (e) {
                 console.log(e)
             }
@@ -83,25 +116,25 @@ export default {
         async Vote1(id) {
             try {
                 // console.log(this.vote)
-                if(this.authorize!=''){
-                    if (this.voter_store.Voters.voted != true ) {
-                    const contract = backend.voterSigner(this.voter_store.voter_address)
-                    console.log("id", id)
-                    console.log(this.voter_store.voter_address)
-                    console.log(this.contract_store.contract_signer)
-                    await this.contract_store.contract_signer.vote(id)
-                    this.first()
-                    this.voter_store.voted()
-                    // console.log(`success from vote ${response}`)
-                    // this.voter_store.voted()
-                    alert('Voted')
-                    location.reload()
-                    this.first()
-                    this.getTotalVotes1()
+                if (this.authorize != '') {
+                    if (this.voter_store.Voters.voted != true) {
+                        const contract = backend.voterSigner(this.voter_store.voter_address)
+                        console.log("id", id)
+                        console.log(this.voter_store.voter_address)
+                        console.log(this.contract_store.contract_signer)
+                        await this.contract_store.contract_signer.vote(id)
+                        this.first()
+                        this.voter_store.voted()
+                        // console.log(`success from vote ${response}`)
+                        // this.voter_store.voted()
+                        alert('Voted')
+                        location.reload()
+                        this.first()
+                        this.getTotalVotes1()
+                    } else {
+                        alert('Already voted')
+                    }
                 } else {
-                    alert('Already voted')
-                }
-                }else{
                     alert('You have to authorized yourself')
                 }
             } catch (e) {
@@ -111,19 +144,19 @@ export default {
     },
     beforeMount() {
         backend.loader();
-        
+
         // this.first()
         // this.getTotalVotes1()
     },
     mounted() {
-        
+
         // console.log()
-         this.first()
-         this.getTotalVotes1()
-         console.log(this.candidate_store.candidates)
+        this.first()
+        this.getTotalVotes1()
+        console.log(this.candidate_store.candidates)
     },
-    updated(){
-        
+    updated() {
+
     }
 
 }
@@ -138,6 +171,7 @@ export default {
                     <Button text="Home Page"></Button>
                 </router-link>
                 <Button @click="refresh" text="Refresh Page"></Button>
+                <Button @click="EndElection" text="End Election"></Button>
             </div>
 
         </nav>

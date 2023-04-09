@@ -60,10 +60,10 @@ console.log(response)
                 if (response) {
                     this.voter_store.addVoters({
                         name: response.name,
-                        lastname: response.lastname,
+                        lastname: response.fathername,
                         age: response.age,
                         phone_number: response.phone_number,
-                        aadhar_card: response.aadhar_card,
+                        aadhar_card: response.adharcard ,
                         authorised: response.authorised,
                         voted: response.voted
                     })

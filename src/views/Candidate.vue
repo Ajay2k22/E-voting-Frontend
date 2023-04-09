@@ -2,6 +2,8 @@
 import Button from '../components/basic/Button.vue';
 import { candidateStore } from '../store/candidate.js'
 import { contractStore } from '../store/contractStore.js'
+// import { useToast } from 'vue-toast-notification';
+// import 'vue-toast-notification/dist/theme-sugar.css';
 
 // import { $store } from '../$store';
 export default {
@@ -51,7 +53,18 @@ export default {
 
                     console.log(`success ${response}`)
                     alert(`Successfully Candidate Added name ${this.candidate.name} age ${this.candidate.age} party ${this.candidate.party}  `)
+                    this.candidate.name = ""
+                    this.candidate.age = ""
+                    this.candidate.party = ""
+                    // const $toast = useToast();
+                    //   let instance = $toast.open({
+                    //     message: 'Election has been started',
+                    //     // type: 'One of success',
+                    //     duration: 3000,
+                    //     position: 'top',
 
+                    //     // all of other options may go here
+                    //   });
                 } else {
                     alert('all fields are required')
                 }
@@ -92,7 +105,6 @@ export default {
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>

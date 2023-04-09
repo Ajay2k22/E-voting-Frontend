@@ -5,7 +5,7 @@ import { contractStore } from '../store/contractStore.js';
 export const backend = {
    
     async voterSigner(voter_address) {
-        let contractAddress = "0x4A258BCD25355A1261205C35511A94d8BBfc63D3";
+        let contractAddress = "0x5B7bC8A7692BD60508a44f8B79CC37e61B1d1d99";
         let signer3 = new ethers.providers.JsonRpcProvider("http://localhost:8545").getSigner(voter_address)
         let contract_signer = new ethers.Contract(
             contractAddress,
@@ -20,7 +20,7 @@ export const backend = {
     },
     async loader() {
         try {
-            let contractAddress = "0x4A258BCD25355A1261205C35511A94d8BBfc63D3";
+            let contractAddress = "0x5B7bC8A7692BD60508a44f8B79CC37e61B1d1d99";
             let url = "http://localhost:8545";
             let provider = new ethers.providers.JsonRpcProvider(url);
             console.log('signer')

@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      ipfs:"",
+      ipfs: "",
       vote: {
         name: "",
         lastname: "",
@@ -33,23 +33,36 @@ export default {
     };
   },
   methods: {
-    
-    created(){
-      this.ipfs=new IPFS();
+
+    created() {
+      this.ipfs = new IPFS();
     },
     async addVoter12() {
       try {
         if (
           this.vote.name != "" &&
           this.vote.age != "" &&
-          this.vote.lastname != "" && this.vote.age>17 && this.vote.aadhar_card.length===12 && this.vote.phone.length===10 &&
+          this.vote.lastname != "" && this.vote.age > 17 && this.vote.aadhar_card.length === 12 && this.vote.phone.length === 10 &&
           this.vote.aadhar_card != "" &&
           this.vote.phone != "" &&
           this.vote.aadhar_card != "" &&
           this.vote.voteraddress != ""
         ) {
-console.log(this.vote.aadhar_card.length)
-        
+          console.log(this.vote.aadhar_card.length)
+
+          // check whether voter_address/aadhar card is already taken or not
+          try {
+            let response = await this.contract_store.contract.voters(this.vote.voteraddress)
+            if (response.adharcard != "") {
+              alert("Wrong Credentials Check Voter Address or Aadhar Card")
+              return
+            }
+            
+          } catch (e) {
+            console.log('Error:voter_address/aadhar card is already taken or not')
+            alert('Error:voter_address/aadhar card is already taken or not')
+            console.log(e)
+          }
 
           let response = await this.contract_store.contract.addVoter(
             this.vote.voteraddress,
@@ -64,7 +77,7 @@ console.log(this.vote.aadhar_card.length)
           this.voter_store.addVoteraddress({
             voter_address: this.vote.voteraddress,
           });
-         
+
 
           const vote_address1 = {
             voter_address: this.vote.voteraddress,
@@ -110,35 +123,19 @@ console.log(this.vote.aadhar_card.length)
       <span>Registration</span>
       <div class="register-input">
         <label>FirstName</label>
-        <input
-          placeholder="Enter Firstname"
-          v-model="this.vote.name"
-          type="text"
-        />
+        <input placeholder="Enter Firstname" v-model="this.vote.name" type="text" />
       </div>
       <div class="register-input">
         <label>Lastname</label>
-        <input
-          placeholder="Enter Lastname"
-          v-model="this.vote.lastname"
-          type="text"
-        />
+        <input placeholder="Enter Lastname" v-model="this.vote.lastname" type="text" />
       </div>
       <div class="register-input">
         <label>PhoneNumber</label>
-        <input
-          placeholder="Enter Phone number"
-          v-model="this.vote.phone"
-          type="text"
-        />
+        <input placeholder="Enter Phone number" v-model="this.vote.phone" type="text" />
       </div>
       <div class="register-input">
         <label>Aadhar Card</label>
-        <input
-          placeholder="Enter Aadhar card No"
-          v-model="this.vote.aadhar_card"
-          type="text"
-        />
+        <input placeholder="Enter Aadhar card No" v-model="this.vote.aadhar_card" type="text" />
       </div>
       <div class="register-input">
         <label>Age</label>
@@ -146,19 +143,14 @@ console.log(this.vote.aadhar_card.length)
       </div>
       <div class="register-input">
         <label>Voter Address</label>
-        <input
-          placeholder="Enter Voter Address"
-          v-model="this.vote.voteraddress"
-          type="text"
-        />
+        <input placeholder="Enter Voter Address" v-model="this.vote.voteraddress" type="text" />
       </div>
 
       <Button @click="addVoter12" text="Register" />
 
-      <span style="font-size: 1.1rem"
-        >Already Registered ?
-        <router-link :to="{ name: 'Login' }" style="text-decoration: none"
-          ><span style="color: var(--secondary); font-size: 1.1rem">Login</span>
+      <span style="font-size: 1.1rem">Already Registered ?
+        <router-link :to="{ name: 'Login' }" style="text-decoration: none"><span
+            style="color: var(--secondary); font-size: 1.1rem">Login</span>
         </router-link>
       </span>
     </div>

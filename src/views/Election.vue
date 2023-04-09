@@ -20,7 +20,7 @@ export default {
             candidates: '',
             total_votes: '',
             length: '',
-            authorize:''
+            authorize: ''
         }
     },
 
@@ -29,34 +29,61 @@ export default {
     },
 
     methods: {
+        async EndElection() {
+            let length = await this.contract_store.contract.getNumCandidates()
+            console.log(length.toString())
+            this.length = length.toString()
+
+            for (let i = 0; i < this.length; i++) {
+                let response = await this.contract_store.contract.candidates(i)
+                console.log("main hoon")
+                try {
+                    const res = await axios.post('http://localhost:3000/api/end-election', {
+                        name: response.name,
+                        age: response.age.toString(),
+                        party: response.party,
+                        numVotes: response.numVotes.toString()
+                    })
+                } catch (e) {
+                    console.log(e)
+                }
+
+                // candidate.push(response.name, response.party, response.age.toString(), response.numVotes.toString())
+
+
+            }
+
+            alert("Election has been ended")
+        },
+
         async authorizeVoter1() {
             try {
                 let response = await this.contract_store.contract.authorizeVoter1(this.voter_store.voter_address)
                 console.log(`success ${response}`)
-                this.authorize=response.toString()
+                this.authorize = response.toString()
                 alert('Authorized done')
             } catch (e) {
                 console.log(e)
             }
         },
         async first() {
-            
+
             let length = await this.contract_store.contract.getNumCandidates()
             console.log(length.toString())
             this.length = length.toString()
-            if (this.length){
+            if (this.length) {
                 for (let i = 0; i < this.length; i++) {
-                let response = await this.contract_store.contract.candidates(i)
-                this.candidate_store.pushCandidate({
-                    id: i,
-                    name: response.name,
-                    age: response.age,
-                    party: response.party,
-                    numvotes: response.numVotes
-                })
+                    let response = await this.contract_store.contract.candidates(i)
+                    this.candidate_store.pushCandidate({
+                        id: i,
+                        name: response.name,
+                        age: response.age,
+                        party: response.party,
+                        numvotes: response.numVotes
+                    })
+                }
             }
-            }
-            
+
             // console.log(response)
 
         },
@@ -65,7 +92,7 @@ export default {
                 let response = await this.contract_store.contract.getTotalVotes()
                 console.log(`success ${response.toString()}`)
                 this.total_votes = response.toString()
-                
+
             } catch (e) {
                 console.log(e)
             }
@@ -79,25 +106,25 @@ export default {
         async Vote1(id) {
             try {
                 // console.log(this.vote)
-                if(this.authorize!=''){
-                    if (this.voter_store.Voters.voted != true ) {
-                    const contract = backend.voterSigner(this.voter_store.voter_address)
-                    console.log("id", id)
-                    console.log(this.voter_store.voter_address)
-                    console.log(this.contract_store.contract_signer)
-                    await this.contract_store.contract_signer.vote(id)
-                    this.first()
-                    this.voter_store.voted()
-                    // console.log(`success from vote ${response}`)
-                    // this.voter_store.voted()
-                    alert('Voted')
-                    location.reload()
-                    this.first()
-                    this.getTotalVotes1()
+                if (this.authorize != '') {
+                    if (this.voter_store.Voters.voted != true) {
+                        const contract = backend.voterSigner(this.voter_store.voter_address)
+                        console.log("id", id)
+                        console.log(this.voter_store.voter_address)
+                        console.log(this.contract_store.contract_signer)
+                        await this.contract_store.contract_signer.vote(id)
+                        this.first()
+                        this.voter_store.voted()
+                        // console.log(`success from vote ${response}`)
+                        // this.voter_store.voted()
+                        alert('Voted')
+                        location.reload()
+                        this.first()
+                        this.getTotalVotes1()
+                    } else {
+                        alert('Already voted')
+                    }
                 } else {
-                    alert('Already voted')
-                }
-                }else{
                     alert('You have to authorized yourself')
                 }
             } catch (e) {
@@ -107,18 +134,18 @@ export default {
     },
     beforeMount() {
         backend.loader();
-        
+
         // this.first()
         // this.getTotalVotes1()
     },
     mounted() {
-        
+
         // console.log()
-         this.first()
-         this.getTotalVotes1()
+        this.first()
+        this.getTotalVotes1()
     },
-    updated(){
-        
+    updated() {
+
     }
 
 }
@@ -153,7 +180,7 @@ export default {
                         <label>Name:{{ candidate.name }}</label>
                         <label>Age:{{ candidate.age }}</label>
                         <label>Party:{{ candidate.party }}</label>
-                     
+
                     </div>
                     <Button @click="this.Vote1(candidate.id)" text="vote"></Button>
                 </div>

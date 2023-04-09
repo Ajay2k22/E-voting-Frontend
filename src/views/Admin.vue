@@ -1,6 +1,8 @@
 <script>
 import Button from "../components/basic/Button.vue";
 // import { $store } from '../$store';
+// import { useToast } from 'vue-toast-notification';
+// import 'vue-toast-notification/dist/theme-sugar.css';
 import { candidateStore } from "../store/candidate.js";
 import { contractStore } from "../store/contractStore.js";
 import { backend } from "../backend";
@@ -22,20 +24,28 @@ export default {
   components: {
     Button,
   },
-  beforeMount(){
+  beforeMount() {
     backend.loader();
   }
   ,
   mounted() {
     console.log("game")
-   
+
     console.log(this.contract_store.election_name)
   },
   methods: {
-   
-async startElection1(){
-    this.$router.push({ name: "ElectionAdmin" });
-},
+
+    async startElection1() {
+      // const $toast = useToast();
+      // let instance = $toast.open({
+      //   message: 'Something went wrong!',
+      //   type: 'default',
+      //   duration: 5000
+      //   // all of other options may go here
+      // });
+
+      this.$router.push({ name: "ElectionAdmin" });
+    },
 
     async startElection() {
       try {
@@ -50,6 +60,17 @@ async startElection1(){
 
           console.log(`success owner ${this.contract_store.election_name}`);
           alert("Election has been started");
+          // const $toast = useToast();
+          // let instance = $toast.open({
+          //   message: 'Election has been started',
+          //   // type: 'One of success',
+          //   duration: 3000,
+          //   position: 'top',
+            
+          //   // all of other options may go here
+          // });
+          // instance.dismiss();
+
           this.$router.push({ name: "Candidate" });
         } else {
           alert("Election names are required");
@@ -73,14 +94,10 @@ async startElection1(){
         improving various aspects of the electoral process.
       </span>
     </div>
-    <div v-if="this.contract_store.election_name===''" class="election">
+    <div v-if="this.contract_store.election_name === ''" class="election">
       <div class="register-input">
         <label>Enter Election Name</label>
-        <input
-          v-model="this.election_name"
-          placeholder="Enter Election Name"
-          type="text"
-        />
+        <input v-model="this.election_name" placeholder="Enter Election Name" type="text" />
         <Button text="Submit" @click="startElection"></Button>
         <Button text="Current Election Result" @click="startElection1"></Button>
       </div>

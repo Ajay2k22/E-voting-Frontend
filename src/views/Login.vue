@@ -32,10 +32,16 @@ export default {
             try {
                 if ( this.vote.voter_address != '' && this.vote.aadhar_card != '' && this.vote.aadhar_card.length===12) {
                 try{
+                    
                     const res=await this.contract_store.contract.voters(this.vote.voter_address) 
-                    if (res.aadhar_card===this.vote.aadhar_card){
+                    
+                    console.log(`${res} `)
+                    console.log(`response aadharcard:-${res.aadharcard} input aadharcard ${this.vote.aadhar_card}`)
+                    if (res.adharcard ===this.vote.aadhar_card){
                         this.voter_store.addVoteraddress({voter_address:this.vote.voter_address})
+                        // alert(' is this running')
                         this.$router.push({name:'Dashboard'})
+                        // alert(' is this running no')
                     }
                 }catch(e){
                     console.log(e)
